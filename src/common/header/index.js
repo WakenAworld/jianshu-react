@@ -1,17 +1,40 @@
 import React, {PureComponent} from "react";
-import {HeaderWrapper, Logo, Nav, NavItem, NavSearch,Addition,Button,SearchWrapper} from "./style";
+import {connect} from "react-redux";
+import {HeaderWrapper, Logo, Nav, NavItem, NavSearch,Addition,Button,
+  SearchWrapper,SearchInfo,SearchInfoTitle,SearchInfoSwitch,SearchInfoList,SearchInfoItem} from "./style";
+import {CSSTransition} from "react-transition-group";
+import {actionCreator} from './store';
 
 class Header extends PureComponent{
-  constructor(props) {
-    super(props);
-    this.state = {
-      focused: false
-    };
-    this.handleFocused = this.handleFocused.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-  }
+  getListItem() {
+    const {focused, list} = this.props;
+    if (focused){
+      return (
+        <SearchInfo>
+          <SearchInfoTitle>
+            热门搜索
+            <SearchInfoSwitch>换一批</SearchInfoSwitch>
+          </SearchInfoTitle>
+          <SearchInfoList>
+            {
+              list.map((item,index)=>{
+                return (
+                  <SearchInfoItem key={index}>
+                    {item}
+                  </SearchInfoItem>
+                )
+              })
+            }
+          </SearchInfoList>
+        </SearchInfo>
+      );
+    } else {
+      return null;
+    }
+  };
 
   render() {
+    const {focused, handleFocused,handleBlur} = this.props;
     return (
       <HeaderWrapper>
         <Logo />
@@ -20,15 +43,23 @@ class Header extends PureComponent{
           <NavItem className="left">下载App</NavItem>
           <NavItem className="right">登录</NavItem>
           <NavItem className="right">
-            <i className="iconfont">&#xe636;</i>
+            {/*Aa图标显示*/}
+            <i className="iconfont Aa">&#xe636;</i>
           </NavItem>
           <SearchWrapper>
-            <NavSearch
-              className={this.state.focused ? 'focused' : ''}
-              onFocus={this.handleFocused}
-              onBlur={this.handleBlur}
-            />
-            <i className={this.state.focused ? 'focused iconfont' : 'iconfont'}>&#xe60c;</i>
+            <CSSTransition
+              in={focused}
+              timeout={400}
+              classNames="slide"
+            >
+              <NavSearch
+                className={focused ? 'focused' : ''}
+                onFocus={handleFocused}
+                onBlur={handleBlur}
+              />
+            </CSSTransition>
+            <i className={focused ? 'focused iconfont' : 'iconfont'}>&#xe60c;</i>
+            {this.getListItem()}
           </SearchWrapper>
           <Addition>
             <Button className="writing">
@@ -41,21 +72,25 @@ class Header extends PureComponent{
       </HeaderWrapper>
     )
   }
-
-  handleFocused(){
-    this.setState(()=>{
-      return {
-        focused: true
-      }
-    })
-  }
-  handleBlur(){
-    this.setState(()=>{
-      return {
-        focused: false
-      }
-    })
-  }
 }
 
-export default Header;
+const mapStateToProps = (state) => {
+  return {
+    focused: state.get('header').get('focused'),
+    list: state.getIn(['header', 'list']) // 等价于上面的写法
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    handleFocused() {
+      dispatch(actionCreator.getList());
+      dispatch(actionCreator.searchFocus());
+    },
+    handleBlur() {
+      dispatch(actionCreator.searchBlur());
+    }
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

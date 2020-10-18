@@ -17,5 +17,8 @@ export const IconGlobalStyled = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  &.Aa {
+    font-size: 20px;
+  }
 `;
 

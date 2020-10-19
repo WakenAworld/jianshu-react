@@ -40,7 +40,7 @@ export const NavItem = styled.div`
     color: #969696;
   }
   &.active {
-    color: #ea6f5a; 
+    color: #ea6f5a;
   }
 `;
 

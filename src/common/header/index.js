@@ -7,24 +7,32 @@ import {actionCreator} from './store';
 
 class Header extends PureComponent{
   getListItem() {
-    const {focused, list} = this.props;
-    if (focused){
+    const {focused, list, page,totalPage, handleMouseEnter,handleChangePage,mouseIn,handleMouseLeave} = this.props;
+    const jsList = list.toJS();
+    const pageList = [];
+    if(jsList.length){
+      for (let i = (page-1) * 10; i < page * 10; i++) {
+        pageList.push(
+          <SearchInfoItem key={i}>{jsList[i]}</SearchInfoItem>
+        )
+      }
+    }
+    if (focused || mouseIn){
       return (
-        <SearchInfo>
+        <SearchInfo
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           <SearchInfoTitle>
             热门搜索
-            <SearchInfoSwitch>换一批</SearchInfoSwitch>
+            <SearchInfoSwitch
+              onClick={()=>handleChangePage(page,totalPage)}
+            >
+              换一批
+            </SearchInfoSwitch>
           </SearchInfoTitle>
           <SearchInfoList>
-            {
-              list.map((item,index)=>{
-                return (
-                  <SearchInfoItem key={index}>
-                    {item}
-                  </SearchInfoItem>
-                )
-              })
-            }
+            {pageList}
           </SearchInfoList>
         </SearchInfo>
       );
@@ -34,7 +42,7 @@ class Header extends PureComponent{
   };
 
   render() {
-    const {focused, handleFocused,handleBlur} = this.props;
+    const {focused, handleFocused, handleBlur} = this.props;
     return (
       <HeaderWrapper>
         <Logo />
@@ -77,7 +85,10 @@ class Header extends PureComponent{
 const mapStateToProps = (state) => {
   return {
     focused: state.get('header').get('focused'),
-    list: state.getIn(['header', 'list']) // 等价于上面的写法
+    list: state.getIn(['header', 'list']), // 等价于上面的写法
+    page: state.getIn(['header','page']),
+    totalPage: state.getIn(['header','totalPage']),
+    mouseIn: state.getIn(['header','mouseIn']),
   }
 };
 
@@ -89,6 +100,15 @@ const mapDispatchToProps = (dispatch) => {
     },
     handleBlur() {
       dispatch(actionCreator.searchBlur());
+    },
+    handleMouseEnter() {
+      dispatch(actionCreator.mouseEnter());
+    },
+    handleMouseLeave() {
+      dispatch(actionCreator.mouseLeave());
+    },
+    handleChangePage(page, totalPage) {
+      dispatch(actionCreator.changePage( ((page+1) % totalPage)+1 ));
     }
   }
 };

@@ -1,7 +1,10 @@
 import React, {PureComponent} from "react";
 import {connect} from "react-redux";
-import {HeaderWrapper, Logo, Nav, NavItem, NavSearch,Addition,Button,
-  SearchWrapper,SearchInfo,SearchInfoTitle,SearchInfoSwitch,SearchInfoList,SearchInfoItem} from "./style";
+import {HeaderWrapper,
+  Logo, Nav, NavItem, NavSearch,Addition,Button,
+  SearchWrapper,SearchInfo,SearchInfoTitle,
+  SearchInfoSwitch,SearchInfoList,SearchInfoItem
+} from "./style";
 import {CSSTransition} from "react-transition-group";
 import {actionCreator} from './store';
 
@@ -28,6 +31,7 @@ class Header extends PureComponent{
             <SearchInfoSwitch
               onClick={()=>handleChangePage(page,totalPage)}
             >
+              <i className="iconfont spin">&#xe851;</i>
               换一批
             </SearchInfoSwitch>
           </SearchInfoTitle>
@@ -66,7 +70,7 @@ class Header extends PureComponent{
                 onBlur={handleBlur}
               />
             </CSSTransition>
-            <i className={focused ? 'focused iconfont' : 'iconfont'}>&#xe60c;</i>
+            <i className={focused ? 'focused iconfont zoom' : 'iconfont zoom'}>&#xe60c;</i>
             {this.getListItem()}
           </SearchWrapper>
           <Addition>

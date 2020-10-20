@@ -29,9 +29,9 @@ class Header extends PureComponent{
           <SearchInfoTitle>
             热门搜索
             <SearchInfoSwitch
-              onClick={()=>handleChangePage(page,totalPage)}
+              onClick={()=>handleChangePage(page,totalPage,this.spinIcon)}
             >
-              <i className="iconfont spin">&#xe851;</i>
+              <i ref={(icon)=>{this.spinIcon = icon}} className="iconfont spin">&#xe851;</i>
               换一批
             </SearchInfoSwitch>
           </SearchInfoTitle>
@@ -46,7 +46,7 @@ class Header extends PureComponent{
   };
 
   render() {
-    const {focused, handleFocused, handleBlur} = this.props;
+    const {list, focused, handleFocused, handleBlur} = this.props;
     return (
       <HeaderWrapper>
         <Logo />
@@ -66,7 +66,7 @@ class Header extends PureComponent{
             >
               <NavSearch
                 className={focused ? 'focused' : ''}
-                onFocus={handleFocused}
+                onFocus={()=>handleFocused(list)}
                 onBlur={handleBlur}
               />
             </CSSTransition>
@@ -98,8 +98,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleFocused() {
-      dispatch(actionCreator.getList());
+    handleFocused(list) {
+      (list.size === 0) && dispatch(actionCreator.getList());
       dispatch(actionCreator.searchFocus());
     },
     handleBlur() {
@@ -111,7 +111,15 @@ const mapDispatchToProps = (dispatch) => {
     handleMouseLeave() {
       dispatch(actionCreator.mouseLeave());
     },
-    handleChangePage(page, totalPage) {
+    handleChangePage(page, totalPage, spin) {
+      let transform = spin.style.transform.replace(/[^0-9]/ig,'');
+      if(transform){
+        const newTransform = parseInt(transform,10)+360;
+        spin.style.transform = 'rotate('+newTransform+'deg)';
+      } else {
+        spin.style.transform = 'rotate(360deg)';
+      }
+      
       dispatch(actionCreator.changePage( ((page+1) % totalPage)+1 ));
     }
   }
